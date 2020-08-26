@@ -17,7 +17,6 @@ export default function App() {
 
   useEffect(() => {
     api.get('repositories').then(response => {
-        console.log(response.data)
         setRepositories(response.data)
     })
 }, [])
@@ -26,8 +25,16 @@ export default function App() {
 /*LIKE FUNCTION*/
 
     async function handleLikeRepository(id) {
-        
-      return await api.post(`/repositories/${id}/like`)
+      const response = await api.post(`/repositories/${id}/like`)
+
+      if (response.status === 200) {
+        const repositoryIndex = repositories.findIndex(
+          (repository) => repository.id === id
+        );
+        const newRepositories = [...repositories];
+        newRepositories[repositoryIndex].likes++;
+        setRepositories(newRepositories);
+      }
 
   }
 
@@ -53,16 +60,15 @@ export default function App() {
             <View style={styles.likesContainer}>
               <Text
                 style={styles.likeText}
-                testID={`repository-likes-1`}
+                testID={`repository-likes-${repository.id}`}
               >
-               {repository.likes}
+               {`${repository.likes} curtidas`}
               </Text>
             </View>
             <TouchableOpacity
             style={styles.button}
             onPress={() => handleLikeRepository(repository.id)}
-            testID={`like-button-1`}
-          >
+            testID={`like-button-${repository.id}`}>
             <Text style={styles.buttonText}>Curtir</Text>
           </TouchableOpacity>
         </View>
